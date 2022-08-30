@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import json
+import os
 from pprint import pprint
 import requests
 from dispatcher.__init__ import (
@@ -14,6 +15,18 @@ from dispatcher.__init__ import (
 testing_farm_api_key = get_config()
 args = get_arguments()
 output_divider = 20 * "="
+task_id_list = []
+tmp_base = "/var/tmp/tesar/"
+task_id_log = "task_id_log"
+task_id_log_path = os.path.join(tmp_base, task_id_log)
+
+
+def log_task_id(task_id_list):
+    if not os.path.exists(tmp_base):
+        os.system(f"mkdir {tmp_base}")
+    with open(task_id_log_path, "w") as id_log:
+        for task_id in task_id_list:
+            id_log.write(f"{task_id}\n")
 
 
 def submit_test(
@@ -119,8 +132,12 @@ def submit_test(
             print("Printing payload information:")
             pprint(payload_raw)
             print(print_test_results)
+            task_id_list.append(task_id)
+            log_task_id(task_id_list)
         else:
             print(print_test_results)
+            task_id_list.append(task_id)
+            log_task_id(task_id_list)
 
     except KeyError:
         print(print_key_error)
